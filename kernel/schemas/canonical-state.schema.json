@@ -1,0 +1,48 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "forest://schema/canonical-state/v0.1",
+  "title": "Forest Canonical State",
+  "type": "object",
+  "required": ["schema_version", "project", "position", "ledger", "warrant", "dependencies", "provenance", "quality", "permissions", "decisions", "metrics", "history"],
+  "properties": {
+    "schema_version": {"type": "string"},
+    "project": {
+      "type": "object",
+      "required": ["id", "name", "objective", "status"],
+      "properties": {
+        "id": {"type": "string"},
+        "name": {"type": "string"},
+        "objective": {"type": "string"},
+        "status": {"enum": ["bootstrapping", "running", "blocked", "awaiting_human", "complete", "failed", "paused"]}
+      },
+      "additionalProperties": true
+    },
+    "position": {
+      "type": "object",
+      "required": ["current_node", "completed_nodes", "active_nodes"],
+      "properties": {
+        "current_node": {"type": ["string", "null"]},
+        "completed_nodes": {"type": "array", "items": {"type": "string"}},
+        "active_nodes": {"type": "array", "items": {"type": "string"}}
+      },
+      "additionalProperties": true
+    },
+    "ledger": {
+      "type": "object",
+      "required": ["criteria", "items"],
+      "properties": {
+        "criteria": {"type": "array", "items": {"type": "string"}},
+        "items": {"type": "array", "items": {"type": "object", "required": ["id", "status"], "properties": {"id": {"type": "string"}, "status": {"enum": ["pending", "in_progress", "passed", "failed", "blocked", "waived"]}, "evidence": {"type": "array", "items": {"type": "string"}}}, "additionalProperties": true}}
+      }
+    },
+    "warrant": {"$ref": "forest://schema/production-warrant/v0.1"},
+    "dependencies": {"type": "object", "additionalProperties": true},
+    "provenance": {"type": "object", "additionalProperties": true},
+    "quality": {"type": "object", "additionalProperties": true},
+    "permissions": {"type": "object", "additionalProperties": true},
+    "decisions": {"type": "array", "items": {"type": "object", "additionalProperties": true}},
+    "metrics": {"type": "object", "additionalProperties": true},
+    "history": {"type": "array", "items": {"type": "object", "additionalProperties": true}}
+  },
+  "additionalProperties": true
+}
