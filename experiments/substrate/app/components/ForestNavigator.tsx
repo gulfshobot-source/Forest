@@ -79,6 +79,7 @@ export default function ForestNavigator() {
   const [query, setQuery] = useState('');
   const [detailsOpen, setDetailsOpen] = useState(false);
   const [outlineOpen, setOutlineOpen] = useState(false);
+  const [copied, setCopied] = useState(false);
 
   const updateUrl = useCallback((next: { locus?: string; view?: Representation; scale?: number }, push = true) => {
     const search = new URLSearchParams(params.toString());
@@ -89,6 +90,16 @@ export default function ForestNavigator() {
     if (push) router.push(href);
     else router.replace(href);
   }, [params, pathname, router]);
+
+  const copyPlace = useCallback(async () => {
+    try {
+      await navigator.clipboard.writeText(window.location.href);
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 1400);
+    } catch {
+      setCopied(false);
+    }
+  }, []);
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -187,11 +198,13 @@ export default function ForestNavigator() {
                 </button>
               ))}
             </div>
-            <div className="zoom-controls">
-              <button onClick={() => updateUrl({ scale: scale - 1 }, false)} aria-label="Zoom out">−</button>
-              <span>scale {scale}</span>
-              <button onClick={() => updateUrl({ scale: scale + 1 }, false)} aria-label="Zoom in">+</button>
-            </div>
+            {representation === 'atlas' && (
+              <div className="zoom-controls">
+                <button onClick={() => updateUrl({ scale: scale - 1 }, false)} aria-label="Zoom out">−</button>
+                <span>scale {scale}</span>
+                <button onClick={() => updateUrl({ scale: scale + 1 }, false)} aria-label="Zoom in">+</button>
+              </div>
+            )}
           </div>
 
           <div className={`viewport view-${representation}`}>
@@ -236,7 +249,7 @@ export default function ForestNavigator() {
             )}
 
             {representation === 'network' && (
-              <div className="network-view">
+              <div className="network-view" style={{ paddingBottom: 96 }}>
                 <div className="network-center">
                   <span className={`state-mark state-${locus.state}`} />
                   <strong>{locus.name}</strong>
@@ -262,7 +275,7 @@ export default function ForestNavigator() {
             )}
 
             {representation === 'outline' && (
-              <div className="focus-outline">
+              <div className="focus-outline" style={{ paddingBottom: 96 }}>
                 <section>
                   <span className="section-kicker">You are here</span>
                   <h2>{locus.name}</h2>
@@ -323,6 +336,23 @@ export default function ForestNavigator() {
             <span className="section-kicker">Canonical home</span>
             <code>{locus.canonicalPath ?? 'none declared'}</code>
           </div>
+          <div className="detail-block">
+            <span className="section-kicker">Return to this place</span>
+            <p>The current locus, representation, and scale are encoded in this URL.</p>
+            <button
+              onClick={copyPlace}
+              style={{
+                width: '100%',
+                marginTop: 10,
+                border: '1px solid var(--line-strong)',
+                background: 'rgba(255,255,255,0.04)',
+                borderRadius: 10,
+                padding: '9px 10px'
+              }}
+            >
+              {copied ? 'Place link copied' : 'Copy place link'}
+            </button>
+          </div>
           <div className="detail-block warning-block">
             <span className="section-kicker">Projection status</span>
             <p>This app is a non-authoritative projection. Source: {forestSnapshot.sourceRepository}/{forestSnapshot.sourceRef}.</p>
@@ -331,11 +361,11 @@ export default function ForestNavigator() {
       </section>
 
       <div className="mobile-commandbar">
-        <button onClick={() => setOutlineOpen(true)}>☰ Outline</button>
-        <button onClick={() => router.back()}>← Back</button>
-        <button onClick={() => updateUrl({ locus: 'forest', scale: 0 })}>⌾ Home</button>
-        <button onClick={() => router.forward()}>Forward →</button>
-        <button onClick={() => setDetailsOpen(true)}>Details ⓘ</button>
+        <button onClick={() => setOutlineOpen(true)}>Outline</button>
+        <button onClick={() => router.back()}>Back</button>
+        <button onClick={() => updateUrl({ locus: 'forest', scale: 0 })}>Home</button>
+        <button onClick={() => router.forward()}>Forward</button>
+        <button onClick={() => setDetailsOpen(true)}>Info</button>
       </div>
     </main>
   );
