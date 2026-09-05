@@ -58,6 +58,24 @@ export const forestSnapshot: ForestSnapshot = {
       description: 'Foundational resource and capability layer awaiting full formalization.'
     },
     {
+      id: 'foundational-substrate',
+      name: 'Foundational Substrate',
+      kind: 'architecture',
+      state: 'authoritative',
+      parentId: 'forest',
+      canonicalPath: 'architecture/FOUNDATIONAL_SUBSTRATE.md',
+      description: 'Continuity layer binding canonical identity, provenance, dependency, navigation state, projection continuity, operational boundaries, and recoverable movement.'
+    },
+    {
+      id: 'control-surface-target',
+      name: 'Control Surface',
+      kind: 'architecture',
+      state: 'authoritative',
+      parentId: 'forest',
+      canonicalPath: 'architecture/FOREST_CONTROL_SURFACE_TARGET.md',
+      description: 'Human-facing interactive environment for navigating and operating the Forest.'
+    },
+    {
       id: 'canonical-data-model',
       name: 'Canonical Data Model',
       kind: 'architecture',
@@ -120,6 +138,8 @@ export const forestSnapshot: ForestSnapshot = {
     { id: 'contain-irrigation', from: 'forest', to: 'irrigation', label: 'contains', kind: 'contains', state: 'authoritative' },
     { id: 'contain-github', from: 'forest', to: 'github', label: 'contains', kind: 'contains', state: 'authoritative' },
     { id: 'contain-power', from: 'forest', to: 'power', label: 'contains', kind: 'contains', state: 'proposed' },
+    { id: 'contain-substrate', from: 'forest', to: 'foundational-substrate', label: 'depends on', kind: 'depends-on', state: 'authoritative' },
+    { id: 'contain-control', from: 'forest', to: 'control-surface-target', label: 'projects through', kind: 'projects-to', state: 'authoritative' },
     { id: 'contain-canon', from: 'forest', to: 'canonical-data-model', label: 'contains', kind: 'contains', state: 'authoritative' },
     { id: 'contain-viz', from: 'forest', to: 'cognitive-visualization', label: 'contains', kind: 'contains', state: 'authoritative' },
     { id: 'contain-world', from: 'forest', to: 'world-engine', label: 'contains', kind: 'contains', state: 'authoritative' },
@@ -127,6 +147,10 @@ export const forestSnapshot: ForestSnapshot = {
     { id: 'contain-frontier', from: 'forest', to: 'capability-frontier', label: 'contains', kind: 'contains', state: 'authoritative' },
     { id: 'contain-downstairs', from: 'forest', to: 'downstairs-connector-fabric', label: 'contains', kind: 'contains', state: 'authoritative' },
     { id: 'contain-chat', from: 'forest', to: 'forest-chat-app', label: 'contains', kind: 'contains', state: 'verified' },
+    { id: 'substrate-canon', from: 'foundational-substrate', to: 'canonical-data-model', label: 'identity + provenance', kind: 'supports', state: 'authoritative' },
+    { id: 'substrate-downstairs', from: 'foundational-substrate', to: 'downstairs-connector-fabric', label: 'operational continuity', kind: 'supports', state: 'authoritative' },
+    { id: 'substrate-world', from: 'foundational-substrate', to: 'world-engine', label: 'navigation embodiment', kind: 'projects-to', state: 'authoritative' },
+    { id: 'substrate-control', from: 'foundational-substrate', to: 'control-surface-target', label: 'human projection', kind: 'projects-to', state: 'authoritative' },
     { id: 'vine-ai-trading', from: 'ai', to: 'trading', label: 'AI ↔ Trading', kind: 'vine', state: 'authoritative' },
     { id: 'vine-ai-irrigation', from: 'ai', to: 'irrigation', label: 'AI ↔ Irrigation', kind: 'vine', state: 'authoritative' },
     { id: 'vine-harness-canon', from: 'agentic-harness', to: 'canonical-data-model', label: 'Harness ↔ Canonical Data', kind: 'supports', state: 'authoritative' },
