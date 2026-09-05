@@ -24,3 +24,31 @@ jobs:
       - run: npm install
       - run: npm run typecheck
       - run: npm run build
+      - name: Start production server
+        run: |
+          npm run start -- -p 3000 > /tmp/substrate-next.log 2>&1 &
+          echo $! > /tmp/substrate-next.pid
+          for i in {1..30}; do
+            if curl -fsS http://127.0.0.1:3000/ >/dev/null; then
+              exit 0
+            fi
+            sleep 1
+          done
+          cat /tmp/substrate-next.log
+          exit 1
+      - name: Render desktop and mobile evidence
+        run: |
+          mkdir -p visual-evidence
+          BROWSER="$(command -v google-chrome || command -v chromium || command -v chromium-browser)"
+          test -n "$BROWSER"
+          "$BROWSER" --headless --no-sandbox --disable-gpu --hide-scrollbars --window-size=1440,900 \
+            --screenshot=visual-evidence/substrate-desktop.png \
+            'http://127.0.0.1:3000/?locus=forest&view=atlas&scale=0'
+          "$BROWSER" --headless --no-sandbox --disable-gpu --hide-scrollbars --window-size=390,844 \
+            --screenshot=visual-evidence/substrate-mobile.png \
+            'http://127.0.0.1:3000/?locus=world-engine&view=network&scale=0'
+      - uses: actions/upload-artifact@v4
+        with:
+          name: substrate-visual-evidence
+          path: experiments/substrate/app/visual-evidence/*.png
+          if-no-files-found: error
