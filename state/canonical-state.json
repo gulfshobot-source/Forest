@@ -1,0 +1,166 @@
+{
+  "schema_version": "0.1",
+  "project": {
+    "id": "forest",
+    "name": "The Forest",
+    "objective": "Build a persistent, measurable, recursively optimized autonomous production system that advances through canonical state and executable continuation.",
+    "status": "running"
+  },
+  "position": {
+    "current_node": "runtime-control-surface",
+    "completed_nodes": [
+      "canonical-schemas",
+      "autonomous-loop-contract",
+      "runtime-kernel",
+      "atomic-json-persistence",
+      "persistent-runner",
+      "bounded-recovery",
+      "runtime-control-surface"
+    ],
+    "active_nodes": []
+  },
+  "ledger": {
+    "criteria": [
+      "canonical-state",
+      "deterministic-selection",
+      "durable-persistence",
+      "bounded-recovery",
+      "command-surface",
+      "real-executor-adapter",
+      "warrant-regeneration",
+      "telemetry-and-gap-scan",
+      "schema-validation",
+      "end-to-end-verification"
+    ],
+    "items": [
+      {"id": "canonical-state", "status": "passed", "evidence": ["state/canonical-state.json"]},
+      {"id": "deterministic-selection", "status": "passed", "evidence": ["runtime/forest_runtime/core.py"]},
+      {"id": "durable-persistence", "status": "passed", "evidence": ["runtime/forest_runtime/persistence.py", "runtime/forest_runtime/runner.py"]},
+      {"id": "bounded-recovery", "status": "passed", "evidence": ["runtime/forest_runtime/core.py", "runtime/tests/test_core.py"]},
+      {"id": "command-surface", "status": "passed", "evidence": ["runtime/forest_runtime/cli.py", "runtime/pyproject.toml"]},
+      {"id": "real-executor-adapter", "status": "pending", "evidence": []},
+      {"id": "warrant-regeneration", "status": "pending", "evidence": []},
+      {"id": "telemetry-and-gap-scan", "status": "pending", "evidence": []},
+      {"id": "schema-validation", "status": "pending", "evidence": []},
+      {"id": "end-to-end-verification", "status": "pending", "evidence": []}
+    ]
+  },
+  "warrant": {
+    "id": "warrant-runtime-executor-adapter-v0.1",
+    "state_version": "forest-state-2026-09-06-1",
+    "objective": "Connect the portable continuation runtime to a real executor boundary without coupling the kernel to a single provider.",
+    "position": "runtime-control-surface",
+    "task": "real-executor-adapter",
+    "selection_reason": "The kernel, persistence layer, bounded recovery, and CLI exist; execution remains the highest-leverage missing capability required for real autonomous production.",
+    "dependencies": ["runtime-control-surface", "bounded-recovery"],
+    "inputs": ["canonical state", "selected task", "executor configuration"],
+    "outputs": ["executor result object", "artifact/evidence references", "measurements", "classified failure data"],
+    "procedures": ["define executor protocol", "implement portable subprocess executor", "capture stdout/stderr/exit code/duration", "apply timeout", "return normalized result"],
+    "tests": ["successful command", "failing command", "timeout", "invalid configuration"],
+    "permissions": ["local subprocess execution when explicitly configured by runtime operator"],
+    "recovery": {
+      "retry_allowed": true,
+      "max_retries": 1,
+      "rollback_required_on_failure": false,
+      "notes": "Executor failures must be captured as evidence and bounded; the kernel must remain usable with future non-subprocess adapters."
+    },
+    "measurement": ["execution duration", "exit code", "attempt count", "failure classification"],
+    "next_candidates": ["warrant-regeneration", "telemetry-and-gap-scan", "schema-validation"]
+  },
+  "tasks": [
+    {
+      "id": "real-executor-adapter",
+      "status": "pending",
+      "dependencies": ["runtime-control-surface", "bounded-recovery"],
+      "leverage": 10,
+      "reuse": 10,
+      "observability": 8,
+      "recovery": {"retry_allowed": true, "max_retries": 1}
+    },
+    {
+      "id": "warrant-regeneration",
+      "status": "pending",
+      "dependencies": ["real-executor-adapter"],
+      "leverage": 9,
+      "reuse": 9,
+      "observability": 9
+    },
+    {
+      "id": "telemetry-and-gap-scan",
+      "status": "pending",
+      "dependencies": ["real-executor-adapter"],
+      "leverage": 8,
+      "reuse": 9,
+      "observability": 10
+    },
+    {
+      "id": "schema-validation",
+      "status": "pending",
+      "dependencies": ["warrant-regeneration"],
+      "leverage": 7,
+      "reuse": 9,
+      "observability": 8
+    },
+    {
+      "id": "end-to-end-verification",
+      "status": "pending",
+      "dependencies": ["schema-validation", "telemetry-and-gap-scan"],
+      "leverage": 10,
+      "reuse": 8,
+      "observability": 10
+    }
+  ],
+  "dependencies": {
+    "real-executor-adapter": ["runtime-control-surface", "bounded-recovery"],
+    "warrant-regeneration": ["real-executor-adapter"],
+    "telemetry-and-gap-scan": ["real-executor-adapter"],
+    "schema-validation": ["warrant-regeneration"],
+    "end-to-end-verification": ["schema-validation", "telemetry-and-gap-scan"]
+  },
+  "provenance": {
+    "canonical_repository": "gulfshobot-source/Forest",
+    "state_basis": [
+      "kernel/schemas/canonical-state.schema.json",
+      "kernel/schemas/production-warrant.schema.json",
+      "loop/AUTONOMOUS-LOOP.md",
+      "runtime/forest_runtime/core.py",
+      "runtime/forest_runtime/persistence.py",
+      "runtime/forest_runtime/runner.py",
+      "runtime/forest_runtime/cli.py"
+    ]
+  },
+  "quality": {
+    "completion_claim_policy": "No completion without ledger evidence and end-to-end verification.",
+    "known_verification_gap": "Repository commits are verified; the test suite has not yet been executed in a checked-out runtime during this continuation session."
+  },
+  "permissions": {
+    "repository_mutation": "authorized through connected GitHub capability",
+    "external_execution": "must be explicitly configured by runtime operator/environment"
+  },
+  "decisions": [
+    {
+      "id": "portable-executor-boundary",
+      "status": "accepted",
+      "decision": "Keep executor injection replaceable rather than hard-code a single agent/provider into the kernel."
+    },
+    {
+      "id": "bounded-recovery-default",
+      "status": "accepted",
+      "decision": "Retries require an explicit recovery policy and are bounded by max_retries."
+    }
+  ],
+  "metrics": {
+    "runtime_source_files": 5,
+    "runtime_test_files": 2,
+    "completion_criteria_total": 10,
+    "completion_criteria_passed": 5,
+    "completion_fraction": 0.5
+  },
+  "history": [
+    {
+      "type": "state_initialized",
+      "date": "2026-09-06",
+      "summary": "Established repository-resident canonical runtime state after persistence, bounded recovery, and CLI control surface were implemented."
+    }
+  ]
+}
