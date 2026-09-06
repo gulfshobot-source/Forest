@@ -22,6 +22,7 @@
       "required": ["retry_allowed", "rollback_required_on_failure"],
       "properties": {
         "retry_allowed": {"type": "boolean"},
+        "max_retries": {"type": "integer", "minimum": 0, "default": 1},
         "rollback_required_on_failure": {"type": "boolean"},
         "notes": {"type": "string"}
       },
