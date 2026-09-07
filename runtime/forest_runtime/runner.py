@@ -12,6 +12,7 @@ from typing import Any, Callable
 
 from .core import continue_once
 from .persistence import load_json, save_json
+from .warrant import apply_regenerated_warrant
 
 Executor = Callable[[dict[str, Any], dict[str, Any]], dict[str, Any]]
 
@@ -41,12 +42,13 @@ def run_once(
     state_path: str | Path,
     executor: Executor,
 ) -> RunResult:
-    """Load, execute exactly one continuation pass, and atomically persist it."""
+    """Load, execute one continuation pass, regenerate its warrant, and persist."""
     state = load_json(state_path)
     validate_minimum_state(state)
     new_state, report = continue_once(state, executor)
     if new_state is not state:
         validate_minimum_state(new_state)
+        apply_regenerated_warrant(new_state)
         save_json(state_path, new_state)
     return RunResult(new_state, report)
 
