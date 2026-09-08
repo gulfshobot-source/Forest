@@ -7,7 +7,7 @@
     "status": "running"
   },
   "position": {
-    "current_node": "telemetry-and-gap-scan",
+    "current_node": "schema-validation",
     "completed_nodes": [
       "canonical-schemas",
       "autonomous-loop-contract",
@@ -18,7 +18,8 @@
       "runtime-control-surface",
       "real-executor-adapter",
       "warrant-regeneration",
-      "telemetry-and-gap-scan"
+      "telemetry-and-gap-scan",
+      "schema-validation"
     ],
     "active_nodes": []
   },
@@ -44,32 +45,32 @@
       {"id": "real-executor-adapter", "status": "passed", "evidence": ["runtime/forest_runtime/executor.py", "runtime/tests/test_executor.py"]},
       {"id": "warrant-regeneration", "status": "passed", "evidence": ["runtime/forest_runtime/warrant.py", "runtime/forest_runtime/runner.py", "runtime/tests/test_warrant.py"]},
       {"id": "telemetry-and-gap-scan", "status": "passed", "evidence": ["runtime/forest_runtime/telemetry.py", "runtime/forest_runtime/runner.py", "runtime/tests/test_telemetry.py"]},
-      {"id": "schema-validation", "status": "pending", "evidence": []},
+      {"id": "schema-validation", "status": "passed", "evidence": ["runtime/forest_runtime/validation.py", "runtime/forest_runtime/runner.py", "runtime/tests/test_validation.py"]},
       {"id": "end-to-end-verification", "status": "pending", "evidence": []}
     ]
   },
   "warrant": {
-    "id": "warrant-schema-validation",
-    "state_version": "forest-state-2026-09-07-3",
-    "objective": "Enforce canonical state and production-warrant schemas at runtime boundaries so malformed durable state cannot silently advance.",
-    "position": "telemetry-and-gap-scan",
-    "task": "schema-validation",
-    "selection_reason": "Executor, warrant regeneration, and observability are implemented; schema enforcement is now the highest-leverage unblocked gate before end-to-end verification.",
-    "dependencies": ["warrant-regeneration"],
-    "inputs": ["canonical state", "canonical-state schema", "production-warrant schema"],
-    "outputs": ["validated state", "structured validation failure evidence"],
-    "procedures": ["load schemas", "resolve production-warrant reference", "validate before mutation", "validate regenerated state before persistence"],
-    "tests": ["valid canonical state passes", "missing required field fails", "invalid warrant fails", "runner refuses invalid state"],
+    "id": "warrant-end-to-end-verification",
+    "state_version": "forest-state-2026-09-08-4",
+    "objective": "Build a persistent, measurable, recursively optimized autonomous production system that advances through canonical state and executable continuation.",
+    "position": "schema-validation",
+    "task": "end-to-end-verification",
+    "selection_reason": "Highest-leverage unblocked task; score=10.9",
+    "dependencies": ["schema-validation", "telemetry-and-gap-scan"],
+    "inputs": ["canonical state", "selected task"],
+    "outputs": ["task result", "evidence", "measurements"],
+    "procedures": ["execute selected task", "verify result", "persist state"],
+    "tests": ["task-specific verification"],
     "permissions": [],
-    "recovery": {"retry_allowed": false, "max_retries": 0, "rollback_required_on_failure": true},
-    "measurement": ["validation result", "validation error path", "schema version"],
-    "next_candidates": ["end-to-end-verification"]
+    "recovery": {"retry_allowed": false, "max_retries": 0, "rollback_required_on_failure": false},
+    "measurement": ["attempt count", "result status"],
+    "next_candidates": []
   },
   "tasks": [
     {"id": "real-executor-adapter", "status": "complete", "dependencies": ["runtime-control-surface", "bounded-recovery"], "leverage": 10, "reuse": 10, "observability": 8, "recovery": {"retry_allowed": true, "max_retries": 1}},
     {"id": "warrant-regeneration", "status": "complete", "dependencies": ["real-executor-adapter"], "leverage": 9, "reuse": 9, "observability": 9},
     {"id": "telemetry-and-gap-scan", "status": "complete", "dependencies": ["real-executor-adapter"], "leverage": 8, "reuse": 9, "observability": 10},
-    {"id": "schema-validation", "status": "pending", "dependencies": ["warrant-regeneration"], "leverage": 7, "reuse": 9, "observability": 8},
+    {"id": "schema-validation", "status": "complete", "dependencies": ["warrant-regeneration"], "leverage": 7, "reuse": 9, "observability": 8},
     {"id": "end-to-end-verification", "status": "pending", "dependencies": ["schema-validation", "telemetry-and-gap-scan"], "leverage": 10, "reuse": 8, "observability": 10}
   ],
   "dependencies": {
@@ -91,12 +92,13 @@
       "runtime/forest_runtime/cli.py",
       "runtime/forest_runtime/executor.py",
       "runtime/forest_runtime/warrant.py",
-      "runtime/forest_runtime/telemetry.py"
+      "runtime/forest_runtime/telemetry.py",
+      "runtime/forest_runtime/validation.py"
     ]
   },
   "quality": {
     "completion_claim_policy": "No completion without ledger evidence and end-to-end verification.",
-    "known_verification_gap": "Repository commits and file contents are verified; the Python test suite has not yet been executed in a checked-out runtime during this continuation session."
+    "known_verification_gap": "Repository commits and file contents are verified; schema-validation tests are committed but the Python test suite has not yet been executed in a checked-out runtime during this continuation session."
   },
   "permissions": {
     "repository_mutation": "authorized through connected GitHub capability",
@@ -106,18 +108,20 @@
     {"id": "portable-executor-boundary", "status": "accepted", "decision": "Keep executor injection replaceable rather than hard-code a single agent/provider into the kernel."},
     {"id": "bounded-recovery-default", "status": "accepted", "decision": "Retries require an explicit recovery policy and are bounded by max_retries."},
     {"id": "warrant-from-canonical-state", "status": "accepted", "decision": "Regenerate the next production warrant from canonical task state after each persisted continuation pass rather than hand-maintaining duplicate control state."},
-    {"id": "derived-observability", "status": "accepted", "decision": "Prefer compact continuation observations plus deterministic gap derivation over duplicating dashboard state as a second source of truth."}
+    {"id": "derived-observability", "status": "accepted", "decision": "Prefer compact continuation observations plus deterministic gap derivation over duplicating dashboard state as a second source of truth."},
+    {"id": "schema-gated-persistence", "status": "accepted", "decision": "Validate canonical state before execution and again after telemetry and warrant regeneration but before persistence; invalid durable state must not silently advance."}
   ],
   "metrics": {
-    "runtime_source_files": 8,
-    "runtime_test_files": 5,
+    "runtime_source_files": 9,
+    "runtime_test_files": 6,
     "completion_criteria_total": 10,
-    "completion_criteria_passed": 8,
-    "completion_fraction": 0.8
+    "completion_criteria_passed": 9,
+    "completion_fraction": 0.9
   },
   "history": [
     {"type": "state_initialized", "date": "2026-09-06", "summary": "Established repository-resident canonical runtime state after persistence, bounded recovery, and CLI control surface were implemented."},
     {"type": "continuation_advanced", "date": "2026-09-07", "summary": "Implemented a portable subprocess executor with bounded observable failure results and automatic production-warrant regeneration; advanced the ledger from 5/10 to 7/10 criteria implemented."},
-    {"type": "continuation_advanced", "date": "2026-09-07", "summary": "Implemented reconstructable continuation telemetry and deterministic gap scanning, integrated observation before persistence, and advanced the ledger to 8/10 criteria implemented."}
+    {"type": "continuation_advanced", "date": "2026-09-07", "summary": "Implemented reconstructable continuation telemetry and deterministic gap scanning, integrated observation before persistence, and advanced the ledger to 8/10 criteria implemented."},
+    {"type": "continuation_advanced", "date": "2026-09-08", "summary": "Implemented JSON Schema enforcement at runtime boundaries, added validation regression tests, and advanced the implementation ledger to 9/10 while preserving end-to-end execution as an explicit verification gate."}
   ]
 }
