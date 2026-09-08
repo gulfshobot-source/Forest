@@ -13,6 +13,7 @@ from typing import Any, Callable
 from .core import continue_once
 from .persistence import load_json, save_json
 from .telemetry import record_continuation_observation
+from .validation import validate_canonical_state
 from .warrant import apply_regenerated_warrant
 
 Executor = Callable[[dict[str, Any], dict[str, Any]], dict[str, Any]]
@@ -25,7 +26,7 @@ class RunResult:
 
 
 def validate_minimum_state(state: dict[str, Any]) -> None:
-    """Reject malformed canonical state before any mutation is persisted."""
+    """Fast structural guard retained for clear local error messages."""
     if not isinstance(state, dict):
         raise ValueError("Canonical state must be an object")
     for key in ("position", "ledger", "tasks"):
@@ -43,14 +44,17 @@ def run_once(
     state_path: str | Path,
     executor: Executor,
 ) -> RunResult:
-    """Load, execute one continuation pass, observe, regenerate warrant, persist."""
+    """Load, validate, execute one pass, regenerate control state, persist."""
     state = load_json(state_path)
     validate_minimum_state(state)
+    validate_canonical_state(state)
+
     new_state, report = continue_once(state, executor)
     if new_state is not state:
         validate_minimum_state(new_state)
         record_continuation_observation(new_state, report)
         apply_regenerated_warrant(new_state)
+        validate_canonical_state(new_state)
         save_json(state_path, new_state)
     return RunResult(new_state, report)
 
