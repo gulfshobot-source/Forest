@@ -11,7 +11,7 @@ from typing import Any
 from jsonschema import Draft202012Validator
 
 
-@dataclass(frozen=True)
+@dataclass
 class ValidationFailure(ValueError):
     schema: str
     path: str
