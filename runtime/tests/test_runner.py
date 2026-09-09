@@ -7,9 +7,30 @@ from forest_runtime.runner import run_once, run_until_stop, validate_minimum_sta
 
 def state():
     return {
+        "schema_version": "0.1",
+        "project": {"id": "test", "name": "Test Forest", "objective": "Ship test state", "status": "running"},
         "position": {"current_node": None, "completed_nodes": [], "active_nodes": []},
         "ledger": {"criteria": ["ship"], "items": [{"id": "ship", "status": "pending"}]},
+        "warrant": {
+            "id": "warrant-one",
+            "state_version": "test-state-1",
+            "objective": "Ship test state",
+            "position": "test",
+            "task": "one",
+            "selection_reason": "test fixture",
+            "inputs": [],
+            "outputs": [],
+            "tests": [],
+            "permissions": [],
+            "recovery": {"retry_allowed": False, "max_retries": 0, "rollback_required_on_failure": False},
+            "measurement": [],
+        },
         "tasks": [{"id": "one", "status": "pending", "dependencies": [], "leverage": 1}],
+        "dependencies": {},
+        "provenance": {},
+        "quality": {},
+        "permissions": {},
+        "decisions": [],
         "history": [],
         "metrics": {},
     }
@@ -34,6 +55,7 @@ def test_run_until_stop_honors_bound(tmp_path: Path):
 
     s = state()
     s["tasks"].append({"id": "two", "status": "pending", "dependencies": ["one"], "leverage": 1})
+    s["dependencies"]["two"] = ["one"]
     save_json(path, s)
     results = run_until_stop(path, lambda _state, _task: {"passed": True}, max_iterations=1)
     assert len(results) == 1
