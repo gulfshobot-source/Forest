@@ -7,7 +7,7 @@
     "status": "running"
   },
   "position": {
-    "current_node": "schema-validation",
+    "current_node": "end-to-end-verification",
     "completed_nodes": [
       "canonical-schemas",
       "autonomous-loop-contract",
@@ -19,7 +19,8 @@
       "real-executor-adapter",
       "warrant-regeneration",
       "telemetry-and-gap-scan",
-      "schema-validation"
+      "schema-validation",
+      "end-to-end-verification"
     ],
     "active_nodes": []
   },
@@ -34,7 +35,8 @@
       "warrant-regeneration",
       "telemetry-and-gap-scan",
       "schema-validation",
-      "end-to-end-verification"
+      "end-to-end-verification",
+      "whole-product-architecture-reconciliation"
     ],
     "items": [
       {"id": "canonical-state", "status": "passed", "evidence": ["state/canonical-state.json"]},
@@ -46,24 +48,25 @@
       {"id": "warrant-regeneration", "status": "passed", "evidence": ["runtime/forest_runtime/warrant.py", "runtime/forest_runtime/runner.py", "runtime/tests/test_warrant.py"]},
       {"id": "telemetry-and-gap-scan", "status": "passed", "evidence": ["runtime/forest_runtime/telemetry.py", "runtime/forest_runtime/runner.py", "runtime/tests/test_telemetry.py"]},
       {"id": "schema-validation", "status": "passed", "evidence": ["runtime/forest_runtime/validation.py", "runtime/forest_runtime/runner.py", "runtime/tests/test_validation.py"]},
-      {"id": "end-to-end-verification", "status": "pending", "evidence": []}
+      {"id": "end-to-end-verification", "status": "passed", "evidence": ["GitHub Actions runtime-test job 102492298361", "25 passed in 0.31s", "commit 95ce42223a51b54344909ccaa8fe7c47b47adf97"]},
+      {"id": "whole-product-architecture-reconciliation", "status": "pending", "evidence": ["sketchpad/product-platform/WHOLE-PRODUCT-ARCHITECTURE.md"]}
     ]
   },
   "warrant": {
-    "id": "warrant-end-to-end-verification",
-    "state_version": "forest-state-2026-09-08-4",
-    "objective": "Build a persistent, measurable, recursively optimized autonomous production system that advances through canonical state and executable continuation.",
-    "position": "schema-validation",
-    "task": "end-to-end-verification",
-    "selection_reason": "Highest-leverage unblocked task; score=10.9",
-    "dependencies": ["schema-validation", "telemetry-and-gap-scan"],
-    "inputs": ["canonical state", "selected task"],
-    "outputs": ["task result", "evidence", "measurements"],
-    "procedures": ["execute selected task", "verify result", "persist state"],
-    "tests": ["task-specific verification"],
+    "id": "warrant-whole-product-architecture-reconciliation",
+    "state_version": "forest-state-2026-09-09-1",
+    "objective": "Reconcile the larger Forest product stack against existing canonical and experimental structures without prematurely promoting provisional ontology.",
+    "position": "end-to-end-verification",
+    "task": "whole-product-architecture-reconciliation",
+    "selection_reason": "Runtime verification gate passed; highest-leverage next step is reconciling the full product architecture so later UI, world-model, memory, agent, and reality-interface work share one coherent map.",
+    "dependencies": ["end-to-end-verification"],
+    "inputs": ["canonical state", "sketchpad/product-platform/WHOLE-PRODUCT-ARCHITECTURE.md", "existing substrate, memory-ecology, and ai-mycelium artifacts"],
+    "outputs": ["reconciliation matrix", "duplicate/conflict register", "promotion candidates", "next bounded implementation tasks"],
+    "procedures": ["recover existing product architecture", "compare layer by layer", "preserve contradictions", "identify missing contracts", "promote only validated relationships"],
+    "tests": ["no duplicate canonical homes", "provenance preserved", "status explicit", "cross-layer dependencies accounted for"],
     "permissions": [],
     "recovery": {"retry_allowed": false, "max_retries": 0, "rollback_required_on_failure": false},
-    "measurement": ["attempt count", "result status"],
+    "measurement": ["layers reconciled", "conflicts surfaced", "promotion candidates", "unresolved contracts"],
     "next_candidates": []
   },
   "tasks": [
@@ -71,14 +74,16 @@
     {"id": "warrant-regeneration", "status": "complete", "dependencies": ["real-executor-adapter"], "leverage": 9, "reuse": 9, "observability": 9},
     {"id": "telemetry-and-gap-scan", "status": "complete", "dependencies": ["real-executor-adapter"], "leverage": 8, "reuse": 9, "observability": 10},
     {"id": "schema-validation", "status": "complete", "dependencies": ["warrant-regeneration"], "leverage": 7, "reuse": 9, "observability": 8},
-    {"id": "end-to-end-verification", "status": "pending", "dependencies": ["schema-validation", "telemetry-and-gap-scan"], "leverage": 10, "reuse": 8, "observability": 10}
+    {"id": "end-to-end-verification", "status": "complete", "dependencies": ["schema-validation", "telemetry-and-gap-scan"], "leverage": 10, "reuse": 8, "observability": 10},
+    {"id": "whole-product-architecture-reconciliation", "status": "pending", "dependencies": ["end-to-end-verification"], "leverage": 10, "reuse": 10, "observability": 9, "inputs": ["sketchpad/product-platform/WHOLE-PRODUCT-ARCHITECTURE.md"]}
   ],
   "dependencies": {
     "real-executor-adapter": ["runtime-control-surface", "bounded-recovery"],
     "warrant-regeneration": ["real-executor-adapter"],
     "telemetry-and-gap-scan": ["real-executor-adapter"],
     "schema-validation": ["warrant-regeneration"],
-    "end-to-end-verification": ["schema-validation", "telemetry-and-gap-scan"]
+    "end-to-end-verification": ["schema-validation", "telemetry-and-gap-scan"],
+    "whole-product-architecture-reconciliation": ["end-to-end-verification"]
   },
   "provenance": {
     "canonical_repository": "gulfshobot-source/Forest",
@@ -93,12 +98,13 @@
       "runtime/forest_runtime/executor.py",
       "runtime/forest_runtime/warrant.py",
       "runtime/forest_runtime/telemetry.py",
-      "runtime/forest_runtime/validation.py"
+      "runtime/forest_runtime/validation.py",
+      "sketchpad/product-platform/WHOLE-PRODUCT-ARCHITECTURE.md"
     ]
   },
   "quality": {
-    "completion_claim_policy": "No completion without ledger evidence and end-to-end verification.",
-    "known_verification_gap": "Repository commits and file contents are verified; schema-validation tests are committed but the Python test suite has not yet been executed in a checked-out runtime during this continuation session."
+    "completion_claim_policy": "No completion without ledger evidence and explicit verification. Completion of one phase must not be conflated with completion of Forest as a whole.",
+    "known_verification_gap": "The runtime kernel is repository-verified with 25 passing tests. The whole-product architecture map is provisional sketchpad material and has not yet passed canonical reconciliation/promotion gates."
   },
   "permissions": {
     "repository_mutation": "authorized through connected GitHub capability",
@@ -109,19 +115,25 @@
     {"id": "bounded-recovery-default", "status": "accepted", "decision": "Retries require an explicit recovery policy and are bounded by max_retries."},
     {"id": "warrant-from-canonical-state", "status": "accepted", "decision": "Regenerate the next production warrant from canonical task state after each persisted continuation pass rather than hand-maintaining duplicate control state."},
     {"id": "derived-observability", "status": "accepted", "decision": "Prefer compact continuation observations plus deterministic gap derivation over duplicating dashboard state as a second source of truth."},
-    {"id": "schema-gated-persistence", "status": "accepted", "decision": "Validate canonical state before execution and again after telemetry and warrant regeneration but before persistence; invalid durable state must not silently advance."}
+    {"id": "schema-gated-persistence", "status": "accepted", "decision": "Validate canonical state before execution and again after telemetry and warrant regeneration but before persistence; invalid durable state must not silently advance."},
+    {"id": "phase-completion-not-forest-completion", "status": "accepted", "decision": "Passing the runtime verification ledger closes the runtime-kernel phase only; the production ledger must extend into the next Forest growth phase rather than returning global DONE."}
   ],
   "metrics": {
     "runtime_source_files": 9,
     "runtime_test_files": 6,
-    "completion_criteria_total": 10,
-    "completion_criteria_passed": 9,
-    "completion_fraction": 0.9
+    "runtime_tests_passed": 25,
+    "runtime_tests_failed": 0,
+    "completion_criteria_total": 11,
+    "completion_criteria_passed": 10,
+    "completion_fraction": 0.9090909091
   },
   "history": [
     {"type": "state_initialized", "date": "2026-09-06", "summary": "Established repository-resident canonical runtime state after persistence, bounded recovery, and CLI control surface were implemented."},
     {"type": "continuation_advanced", "date": "2026-09-07", "summary": "Implemented a portable subprocess executor with bounded observable failure results and automatic production-warrant regeneration; advanced the ledger from 5/10 to 7/10 criteria implemented."},
     {"type": "continuation_advanced", "date": "2026-09-07", "summary": "Implemented reconstructable continuation telemetry and deterministic gap scanning, integrated observation before persistence, and advanced the ledger to 8/10 criteria implemented."},
-    {"type": "continuation_advanced", "date": "2026-09-08", "summary": "Implemented JSON Schema enforcement at runtime boundaries, added validation regression tests, and advanced the implementation ledger to 9/10 while preserving end-to-end execution as an explicit verification gate."}
+    {"type": "continuation_advanced", "date": "2026-09-08", "summary": "Implemented JSON Schema enforcement at runtime boundaries, added validation regression tests, and advanced the implementation ledger to 9/10 while preserving end-to-end execution as an explicit verification gate."},
+    {"type": "verification_failure", "date": "2026-09-08", "summary": "First repository-native CI run failed because pytest was not installed; failure preserved as evidence rather than counted as verification."},
+    {"type": "continuation_advanced", "date": "2026-09-09", "summary": "Declared test dependencies, repaired traceback-unsafe validation exceptions, aligned runner fixtures with canonical schema, and achieved 25/25 passing runtime tests in GitHub Actions."},
+    {"type": "phase_transition", "date": "2026-09-09", "summary": "Closed the verified runtime-kernel phase and opened whole-product architecture reconciliation using a provisional sketchpad map rather than falsely declaring Forest complete."}
   ]
 }
