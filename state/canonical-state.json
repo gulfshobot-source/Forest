@@ -7,7 +7,7 @@
     "status": "running"
   },
   "position": {
-    "current_node": "whole-product-architecture-reconciliation",
+    "current_node": "cross-layer-contract-set",
     "completed_nodes": [
       "canonical-schemas",
       "autonomous-loop-contract",
@@ -21,7 +21,8 @@
       "telemetry-and-gap-scan",
       "schema-validation",
       "end-to-end-verification",
-      "whole-product-architecture-reconciliation"
+      "whole-product-architecture-reconciliation",
+      "cross-layer-contract-set"
     ],
     "active_nodes": []
   },
@@ -38,7 +39,8 @@
       "schema-validation",
       "end-to-end-verification",
       "whole-product-architecture-reconciliation",
-      "cross-layer-contract-set"
+      "cross-layer-contract-set",
+      "live-canonical-registry-adapter"
     ],
     "items": [
       {"id": "canonical-state", "status": "passed", "evidence": ["state/canonical-state.json"]},
@@ -52,25 +54,26 @@
       {"id": "schema-validation", "status": "passed", "evidence": ["runtime/forest_runtime/validation.py", "runtime/forest_runtime/runner.py", "runtime/tests/test_validation.py"]},
       {"id": "end-to-end-verification", "status": "passed", "evidence": ["GitHub Actions runtime-test job 102492298361", "25 passed in 0.31s", "commit 95ce42223a51b54344909ccaa8fe7c47b47adf97"]},
       {"id": "whole-product-architecture-reconciliation", "status": "passed", "evidence": ["sketchpad/product-platform/WHOLE-PRODUCT-RECONCILIATION.md", "gulfshobot-source/the-forest/architecture/WHOLE_PRODUCT_MAP.md"]},
-      {"id": "cross-layer-contract-set", "status": "pending", "evidence": []}
+      {"id": "cross-layer-contract-set", "status": "passed", "evidence": ["gulfshobot-source/the-forest/architecture/FOREST_ADDRESS_RESOLUTION.md", "runtime/forest_runtime/addressing.py", "runtime/forest_runtime/contracts.py", "runtime/tests/test_addressing.py", "runtime/tests/test_contracts.py", "GitHub Actions runtime-test job 103277420900"]},
+      {"id": "live-canonical-registry-adapter", "status": "pending", "evidence": []}
     ]
   },
   "warrant": {
-    "id": "warrant-cross-layer-contract-set",
-    "state_version": "forest-state-2026-09-10-1",
-    "objective": "Define minimal cross-layer contracts so canonical state, runtime execution, Control Surface intent, substrate context, Reality capabilities, experimental promotion, and cross-repository synchronization compose without duplicate authority.",
-    "position": "whole-product-architecture-reconciliation",
-    "task": "cross-layer-contract-set",
-    "selection_reason": "Whole-product reconciliation showed that established canonical subsystem homes already cover most responsibilities; the highest-leverage remaining architecture work is defining the seven interfaces between them.",
-    "dependencies": ["whole-product-architecture-reconciliation"],
-    "inputs": ["gulfshobot-source/the-forest/architecture/WHOLE_PRODUCT_MAP.md", "sketchpad/product-platform/WHOLE-PRODUCT-RECONCILIATION.md", "canonical state", "verified runtime"],
-    "outputs": ["cross-layer contract specification", "machine-readable contract candidates", "verification criteria", "implementation queue"],
-    "procedures": ["define authority boundary", "define input/output identities", "define evidence requirements", "define failure/recovery behavior", "minimize duplicated representation", "map each contract to canonical homes"],
-    "tests": ["no shadow source of truth", "round-trip provenance preserved", "runtime results cannot self-promote", "interfaces remain implementation-replaceable"],
+    "id": "warrant-live-canonical-registry-adapter",
+    "state_version": "forest-state-2026-09-11-1",
+    "objective": "Make the verified address/resolution substrate operate against the actual canonical registry in gulfshobot-source/the-forest without creating a shadow source of truth.",
+    "position": "cross-layer-contract-set",
+    "task": "live-canonical-registry-adapter",
+    "selection_reason": "The seven previously separate cross-layer interfaces now share one address, mutation, and observation protocol family. The highest-leverage remaining gap is resolving those identities against the live canonical registry rather than synthetic fixtures.",
+    "dependencies": ["cross-layer-contract-set"],
+    "inputs": ["gulfshobot-source/the-forest/data/forest.json", "gulfshobot-source/the-forest/architecture/FOREST_ADDRESS_RESOLUTION.md", "runtime/forest_runtime/addressing.py", "runtime/forest_runtime/contracts.py"],
+    "outputs": ["replaceable canonical-registry loader/adapter", "cross-repository resolution verification", "failure/freshness behavior", "next synchronization task"],
+    "procedures": ["load canonical registry through replaceable adapter", "preserve canonical source identity and freshness", "resolve Forest addresses", "reject shadow-authority escalation", "test stale/unavailable behavior", "verify in CI"],
+    "tests": ["actual canonical IDs resolve", "adapter remains replaceable", "repository location is implementation detail", "stale/unavailable state is explicit", "runtime cannot mutate canonical registry through resolver"],
     "permissions": [],
     "recovery": {"retry_allowed": false, "max_retries": 0, "rollback_required_on_failure": false},
-    "measurement": ["contracts specified", "authority boundaries covered", "round-trip paths closed", "implementation tasks derived"],
-    "next_candidates": []
+    "measurement": ["canonical addresses resolved", "adapter failure modes tested", "cross-repository round trip verified"],
+    "next_candidates": ["Control Surface locus integration", "runtime task subject integration", "binding index generation", "synchronization event ingestion"]
   },
   "tasks": [
     {"id": "real-executor-adapter", "status": "complete", "dependencies": ["runtime-control-surface", "bounded-recovery"], "leverage": 10, "reuse": 10, "observability": 8, "recovery": {"retry_allowed": true, "max_retries": 1}},
@@ -79,7 +82,8 @@
     {"id": "schema-validation", "status": "complete", "dependencies": ["warrant-regeneration"], "leverage": 7, "reuse": 9, "observability": 8},
     {"id": "end-to-end-verification", "status": "complete", "dependencies": ["schema-validation", "telemetry-and-gap-scan"], "leverage": 10, "reuse": 8, "observability": 10},
     {"id": "whole-product-architecture-reconciliation", "status": "complete", "dependencies": ["end-to-end-verification"], "leverage": 10, "reuse": 10, "observability": 9, "inputs": ["sketchpad/product-platform/WHOLE-PRODUCT-ARCHITECTURE.md"]},
-    {"id": "cross-layer-contract-set", "status": "pending", "dependencies": ["whole-product-architecture-reconciliation"], "leverage": 10, "reuse": 10, "observability": 10}
+    {"id": "cross-layer-contract-set", "status": "complete", "dependencies": ["whole-product-architecture-reconciliation"], "leverage": 10, "reuse": 10, "observability": 10},
+    {"id": "live-canonical-registry-adapter", "status": "pending", "dependencies": ["cross-layer-contract-set"], "leverage": 10, "reuse": 10, "observability": 10}
   ],
   "dependencies": {
     "real-executor-adapter": ["runtime-control-surface", "bounded-recovery"],
@@ -88,10 +92,12 @@
     "schema-validation": ["warrant-regeneration"],
     "end-to-end-verification": ["schema-validation", "telemetry-and-gap-scan"],
     "whole-product-architecture-reconciliation": ["end-to-end-verification"],
-    "cross-layer-contract-set": ["whole-product-architecture-reconciliation"]
+    "cross-layer-contract-set": ["whole-product-architecture-reconciliation"],
+    "live-canonical-registry-adapter": ["cross-layer-contract-set"]
   },
   "provenance": {
     "canonical_repository": "gulfshobot-source/Forest",
+    "structural_authority_repository": "gulfshobot-source/the-forest",
     "state_basis": [
       "kernel/schemas/canonical-state.schema.json",
       "kernel/schemas/production-warrant.schema.json",
@@ -104,14 +110,17 @@
       "runtime/forest_runtime/warrant.py",
       "runtime/forest_runtime/telemetry.py",
       "runtime/forest_runtime/validation.py",
+      "runtime/forest_runtime/addressing.py",
+      "runtime/forest_runtime/contracts.py",
       "sketchpad/product-platform/WHOLE-PRODUCT-ARCHITECTURE.md",
       "sketchpad/product-platform/WHOLE-PRODUCT-RECONCILIATION.md",
-      "gulfshobot-source/the-forest/architecture/WHOLE_PRODUCT_MAP.md"
+      "gulfshobot-source/the-forest/architecture/WHOLE_PRODUCT_MAP.md",
+      "gulfshobot-source/the-forest/architecture/FOREST_ADDRESS_RESOLUTION.md"
     ]
   },
   "quality": {
     "completion_claim_policy": "No completion without ledger evidence and explicit verification. Completion of one phase must not be conflated with completion of Forest as a whole.",
-    "known_verification_gap": "The runtime kernel is repository-verified with 25 passing tests. Whole-product architecture responsibilities have been reconciled against canonical homes; seven cross-layer interface contracts remain to be specified and verified."
+    "known_verification_gap": "The shared Forest address parser/resolver and mutation/observation envelope implementation pass repository CI, but the resolver has only been tested against synthetic registry fixtures. It has not yet loaded and resolved the live canonical registry from gulfshobot-source/the-forest inside the runtime boundary."
   },
   "permissions": {
     "repository_mutation": "authorized through connected GitHub capability",
@@ -124,20 +133,22 @@
     {"id": "derived-observability", "status": "accepted", "decision": "Prefer compact continuation observations plus deterministic gap derivation over duplicating dashboard state as a second source of truth."},
     {"id": "schema-gated-persistence", "status": "accepted", "decision": "Validate canonical state before execution and again after telemetry and warrant regeneration but before persistence; invalid durable state must not silently advance."},
     {"id": "phase-completion-not-forest-completion", "status": "accepted", "decision": "Passing the runtime verification ledger closes the runtime-kernel phase only; the production ledger must extend into the next Forest growth phase rather than returning global DONE."},
-    {"id": "whole-product-map-not-second-ontology", "status": "accepted", "decision": "Use the whole-product stack as a responsibility/composition lens mapped onto existing canonical homes, not as a new authoritative hierarchy. Keep ThreadMap and deeper cellular/mycelial hypotheses experimental until separately validated."}
+    {"id": "whole-product-map-not-second-ontology", "status": "accepted", "decision": "Use the whole-product stack as a responsibility/composition lens mapped onto existing canonical homes, not as a new authoritative hierarchy. Keep ThreadMap and deeper cellular/mycelial hypotheses experimental until separately validated."},
+    {"id": "one-logical-address-space", "status": "accepted", "decision": "Give each persistent thing one logical Forest identity across all stores and representations; derive resolver indexes from canonical registries rather than maintaining a shadow identity database."},
+    {"id": "shared-cross-layer-envelope", "status": "accepted", "decision": "Compress the seven exposed cross-layer interfaces into a shared family of address, resolution, mutation, and observation envelopes while preserving authority and verification boundaries."}
   ],
   "metrics": {
-    "runtime_source_files": 9,
-    "runtime_test_files": 6,
-    "runtime_tests_passed": 25,
+    "runtime_source_files": 11,
+    "runtime_test_files": 8,
     "runtime_tests_failed": 0,
     "whole_product_layers_reconciled": 11,
     "duplicate_home_risks_removed": 5,
     "architecture_relationships_promoted": 10,
     "cross_layer_contracts_identified": 7,
-    "completion_criteria_total": 12,
-    "completion_criteria_passed": 11,
-    "completion_fraction": 0.9166666667
+    "cross_layer_contracts_compressed_to_protocol_families": 1,
+    "completion_criteria_total": 13,
+    "completion_criteria_passed": 12,
+    "completion_fraction": 0.9230769231
   },
   "history": [
     {"type": "state_initialized", "date": "2026-09-06", "summary": "Established repository-resident canonical runtime state after persistence, bounded recovery, and CLI control surface were implemented."},
@@ -147,6 +158,7 @@
     {"type": "verification_failure", "date": "2026-09-08", "summary": "First repository-native CI run failed because pytest was not installed; failure preserved as evidence rather than counted as verification."},
     {"type": "continuation_advanced", "date": "2026-09-09", "summary": "Declared test dependencies, repaired traceback-unsafe validation exceptions, aligned runner fixtures with canonical schema, and achieved 25/25 passing runtime tests in GitHub Actions."},
     {"type": "phase_transition", "date": "2026-09-09", "summary": "Closed the verified runtime-kernel phase and opened whole-product architecture reconciliation using a provisional sketchpad map rather than falsely declaring Forest complete."},
-    {"type": "continuation_advanced", "date": "2026-09-10", "summary": "Reconciled all 11 provisional whole-product responsibilities against existing canonical architecture, removed five duplicate-home risks, promoted ten supported composition relationships into a canonical whole-product map, preserved experimental boundaries, and opened a seven-contract cross-layer integration phase."}
+    {"type": "continuation_advanced", "date": "2026-09-10", "summary": "Reconciled all 11 provisional whole-product responsibilities against existing canonical architecture, removed five duplicate-home risks, promoted ten supported composition relationships into a canonical whole-product map, preserved experimental boundaries, and opened a seven-contract cross-layer integration phase."},
+    {"type": "continuation_advanced", "date": "2026-09-11", "summary": "Defined one logical Forest address/resolution contract in the canonical structural repository, compressed seven cross-layer interfaces into shared mutation/observation envelopes, implemented a replaceable runtime address parser/resolver with explicit provisional and ambiguity behavior, and verified the expanded runtime suite in GitHub Actions. Opened live canonical-registry adapter integration as the next bounded unit."}
   ]
 }
