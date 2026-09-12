@@ -18,8 +18,14 @@ jobs:
   runtime-test:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Checkout implementation repository
         uses: actions/checkout@v4
+
+      - name: Checkout structural authority repository
+        uses: actions/checkout@v4
+        with:
+          repository: gulfshobot-source/the-forest
+          path: .canonical/the-forest
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -29,5 +35,7 @@ jobs:
       - name: Install runtime test environment
         run: python -m pip install -e "runtime[test]"
 
-      - name: Run runtime tests
+      - name: Run runtime tests against live canonical registry
+        env:
+          FOREST_CANONICAL_REGISTRY_PATH: ${{ github.workspace }}/.canonical/the-forest/data/forest.json
         run: python -m pytest runtime/tests -q
