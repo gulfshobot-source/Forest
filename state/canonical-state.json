@@ -7,7 +7,7 @@
     "status": "running"
   },
   "position": {
-    "current_node": "cross-layer-contract-set",
+    "current_node": "live-canonical-registry-adapter",
     "completed_nodes": [
       "canonical-schemas",
       "autonomous-loop-contract",
@@ -24,7 +24,7 @@
       "whole-product-architecture-reconciliation",
       "cross-layer-contract-set"
     ],
-    "active_nodes": []
+    "active_nodes": ["live-canonical-registry-adapter"]
   },
   "ledger": {
     "criteria": [
@@ -55,25 +55,25 @@
       {"id": "end-to-end-verification", "status": "passed", "evidence": ["GitHub Actions runtime-test job 102492298361", "25 passed in 0.31s", "commit 95ce42223a51b54344909ccaa8fe7c47b47adf97"]},
       {"id": "whole-product-architecture-reconciliation", "status": "passed", "evidence": ["sketchpad/product-platform/WHOLE-PRODUCT-RECONCILIATION.md", "gulfshobot-source/the-forest/architecture/WHOLE_PRODUCT_MAP.md"]},
       {"id": "cross-layer-contract-set", "status": "passed", "evidence": ["gulfshobot-source/the-forest/architecture/FOREST_ADDRESS_RESOLUTION.md", "runtime/forest_runtime/addressing.py", "runtime/forest_runtime/contracts.py", "runtime/tests/test_addressing.py", "runtime/tests/test_contracts.py", "GitHub Actions runtime-test job 103277420900"]},
-      {"id": "live-canonical-registry-adapter", "status": "pending", "evidence": []}
+      {"id": "live-canonical-registry-adapter", "status": "in_progress", "evidence": ["runtime/forest_runtime/registry.py", "runtime/tests/test_registry.py", "GitHub Actions runtime-test job 103562050852", "gulfshobot-source/the-forest:data/forest.json blob cffc6f038dc0eb283e52bbf9842bd9a82f67b6b1", "cross-repository CI fetch attempts 34696938814 and 34696955428 exposed missing repository/network transport authority"]}
     ]
   },
   "warrant": {
     "id": "warrant-live-canonical-registry-adapter",
-    "state_version": "forest-state-2026-09-11-1",
-    "objective": "Make the verified address/resolution substrate operate against the actual canonical registry in gulfshobot-source/the-forest without creating a shadow source of truth.",
-    "position": "cross-layer-contract-set",
+    "state_version": "forest-state-2026-09-12-1",
+    "objective": "Complete live structural-authority registry integration without creating a shadow source of truth by supplying the verified read-only adapter through an authorized transport or mount.",
+    "position": "live-canonical-registry-adapter",
     "task": "live-canonical-registry-adapter",
-    "selection_reason": "The seven previously separate cross-layer interfaces now share one address, mutation, and observation protocol family. The highest-leverage remaining gap is resolving those identities against the live canonical registry rather than synthetic fixtures.",
+    "selection_reason": "The read-only registry adapter, explicit UNAVAILABLE behavior, environment boundary, and canonical-address integration test are implemented and passing in normal CI. The remaining proof gap is transport: the current GitHub Actions token cannot read the separate structural-authority repository and the runner has no general network access. The next leverage point is an authorized registry transport/mount that feeds the same replaceable adapter rather than embedding a second registry.",
     "dependencies": ["cross-layer-contract-set"],
-    "inputs": ["gulfshobot-source/the-forest/data/forest.json", "gulfshobot-source/the-forest/architecture/FOREST_ADDRESS_RESOLUTION.md", "runtime/forest_runtime/addressing.py", "runtime/forest_runtime/contracts.py"],
-    "outputs": ["replaceable canonical-registry loader/adapter", "cross-repository resolution verification", "failure/freshness behavior", "next synchronization task"],
-    "procedures": ["load canonical registry through replaceable adapter", "preserve canonical source identity and freshness", "resolve Forest addresses", "reject shadow-authority escalation", "test stale/unavailable behavior", "verify in CI"],
-    "tests": ["actual canonical IDs resolve", "adapter remains replaceable", "repository location is implementation detail", "stale/unavailable state is explicit", "runtime cannot mutate canonical registry through resolver"],
+    "inputs": ["gulfshobot-source/the-forest/data/forest.json", "runtime/forest_runtime/registry.py", "runtime/forest_runtime/addressing.py", "authorized repository/connector transport"],
+    "outputs": ["authorized live canonical-registry transport", "executed cross-repository resolution proof", "transport freshness/provenance evidence", "next synchronization task"],
+    "procedures": ["obtain canonical registry through an authorized read transport", "mount or inject registry without copying canonical authority", "resolve known Forest addresses through the runtime adapter", "preserve source identity and freshness", "verify unavailable behavior remains explicit", "persist evidence"],
+    "tests": ["actual canonical IDs resolve through runtime adapter", "transport source is recorded", "adapter remains replaceable", "repository location remains implementation detail", "stale/unavailable state is explicit", "runtime cannot mutate canonical registry through resolver"],
     "permissions": [],
     "recovery": {"retry_allowed": false, "max_retries": 0, "rollback_required_on_failure": false},
-    "measurement": ["canonical addresses resolved", "adapter failure modes tested", "cross-repository round trip verified"],
-    "next_candidates": ["Control Surface locus integration", "runtime task subject integration", "binding index generation", "synchronization event ingestion"]
+    "measurement": ["live canonical addresses resolved", "transport failure modes tested", "cross-repository round trip executed"],
+    "next_candidates": ["connector-backed canonical registry transport", "Control Surface locus integration", "runtime task subject integration", "binding index generation", "synchronization event ingestion"]
   },
   "tasks": [
     {"id": "real-executor-adapter", "status": "complete", "dependencies": ["runtime-control-surface", "bounded-recovery"], "leverage": 10, "reuse": 10, "observability": 8, "recovery": {"retry_allowed": true, "max_retries": 1}},
@@ -83,7 +83,7 @@
     {"id": "end-to-end-verification", "status": "complete", "dependencies": ["schema-validation", "telemetry-and-gap-scan"], "leverage": 10, "reuse": 8, "observability": 10},
     {"id": "whole-product-architecture-reconciliation", "status": "complete", "dependencies": ["end-to-end-verification"], "leverage": 10, "reuse": 10, "observability": 9, "inputs": ["sketchpad/product-platform/WHOLE-PRODUCT-ARCHITECTURE.md"]},
     {"id": "cross-layer-contract-set", "status": "complete", "dependencies": ["whole-product-architecture-reconciliation"], "leverage": 10, "reuse": 10, "observability": 10},
-    {"id": "live-canonical-registry-adapter", "status": "pending", "dependencies": ["cross-layer-contract-set"], "leverage": 10, "reuse": 10, "observability": 10}
+    {"id": "live-canonical-registry-adapter", "status": "in_progress", "dependencies": ["cross-layer-contract-set"], "leverage": 10, "reuse": 10, "observability": 10}
   ],
   "dependencies": {
     "real-executor-adapter": ["runtime-control-surface", "bounded-recovery"],
@@ -112,19 +112,23 @@
       "runtime/forest_runtime/validation.py",
       "runtime/forest_runtime/addressing.py",
       "runtime/forest_runtime/contracts.py",
+      "runtime/forest_runtime/registry.py",
+      "runtime/tests/test_registry.py",
       "sketchpad/product-platform/WHOLE-PRODUCT-ARCHITECTURE.md",
       "sketchpad/product-platform/WHOLE-PRODUCT-RECONCILIATION.md",
       "gulfshobot-source/the-forest/architecture/WHOLE_PRODUCT_MAP.md",
-      "gulfshobot-source/the-forest/architecture/FOREST_ADDRESS_RESOLUTION.md"
+      "gulfshobot-source/the-forest/architecture/FOREST_ADDRESS_RESOLUTION.md",
+      "gulfshobot-source/the-forest/data/forest.json"
     ]
   },
   "quality": {
     "completion_claim_policy": "No completion without ledger evidence and explicit verification. Completion of one phase must not be conflated with completion of Forest as a whole.",
-    "known_verification_gap": "The shared Forest address parser/resolver and mutation/observation envelope implementation pass repository CI, but the resolver has only been tested against synthetic registry fixtures. It has not yet loaded and resolved the live canonical registry from gulfshobot-source/the-forest inside the runtime boundary."
+    "known_verification_gap": "A read-only live-registry adapter is implemented, failure behavior is explicit, and the expanded runtime suite passes CI. The actual structural registry was independently inspected through the connected GitHub capability, but an executed cross-repository runtime resolution remains unverified because the CI token cannot read the separate structural-authority repository and the execution container has no network route to GitHub. The adapter criterion therefore remains in progress rather than passed."
   },
   "permissions": {
     "repository_mutation": "authorized through connected GitHub capability",
-    "external_execution": "must be explicitly configured by runtime operator/environment"
+    "external_execution": "must be explicitly configured by runtime operator/environment",
+    "cross_repository_ci_read": "not currently available from the implementation repository workflow token; live registry transport must be mounted or supplied by an authorized connector/runtime"
   },
   "decisions": [
     {"id": "portable-executor-boundary", "status": "accepted", "decision": "Keep executor injection replaceable rather than hard-code a single agent/provider into the kernel."},
@@ -135,17 +139,20 @@
     {"id": "phase-completion-not-forest-completion", "status": "accepted", "decision": "Passing the runtime verification ledger closes the runtime-kernel phase only; the production ledger must extend into the next Forest growth phase rather than returning global DONE."},
     {"id": "whole-product-map-not-second-ontology", "status": "accepted", "decision": "Use the whole-product stack as a responsibility/composition lens mapped onto existing canonical homes, not as a new authoritative hierarchy. Keep ThreadMap and deeper cellular/mycelial hypotheses experimental until separately validated."},
     {"id": "one-logical-address-space", "status": "accepted", "decision": "Give each persistent thing one logical Forest identity across all stores and representations; derive resolver indexes from canonical registries rather than maintaining a shadow identity database."},
-    {"id": "shared-cross-layer-envelope", "status": "accepted", "decision": "Compress the seven exposed cross-layer interfaces into a shared family of address, resolution, mutation, and observation envelopes while preserving authority and verification boundaries."}
+    {"id": "shared-cross-layer-envelope", "status": "accepted", "decision": "Compress the seven exposed cross-layer interfaces into a shared family of address, resolution, mutation, and observation envelopes while preserving authority and verification boundaries."},
+    {"id": "registry-transport-not-registry-copy", "status": "accepted", "decision": "When the runtime cannot directly read the structural-authority repository, solve the boundary with an authorized transport or mount into the replaceable registry adapter. Do not commit a copied forest.json as runtime truth merely to make integration tests pass."}
   ],
   "metrics": {
-    "runtime_source_files": 11,
-    "runtime_test_files": 8,
+    "runtime_source_files": 12,
+    "runtime_test_files": 9,
     "runtime_tests_failed": 0,
     "whole_product_layers_reconciled": 11,
     "duplicate_home_risks_removed": 5,
     "architecture_relationships_promoted": 10,
     "cross_layer_contracts_identified": 7,
     "cross_layer_contracts_compressed_to_protocol_families": 1,
+    "registry_adapter_implemented": 1,
+    "registry_transport_failures_preserved": 2,
     "completion_criteria_total": 13,
     "completion_criteria_passed": 12,
     "completion_fraction": 0.9230769231
@@ -159,6 +166,8 @@
     {"type": "continuation_advanced", "date": "2026-09-09", "summary": "Declared test dependencies, repaired traceback-unsafe validation exceptions, aligned runner fixtures with canonical schema, and achieved 25/25 passing runtime tests in GitHub Actions."},
     {"type": "phase_transition", "date": "2026-09-09", "summary": "Closed the verified runtime-kernel phase and opened whole-product architecture reconciliation using a provisional sketchpad map rather than falsely declaring Forest complete."},
     {"type": "continuation_advanced", "date": "2026-09-10", "summary": "Reconciled all 11 provisional whole-product responsibilities against existing canonical architecture, removed five duplicate-home risks, promoted ten supported composition relationships into a canonical whole-product map, preserved experimental boundaries, and opened a seven-contract cross-layer integration phase."},
-    {"type": "continuation_advanced", "date": "2026-09-11", "summary": "Defined one logical Forest address/resolution contract in the canonical structural repository, compressed seven cross-layer interfaces into shared mutation/observation envelopes, implemented a replaceable runtime address parser/resolver with explicit provisional and ambiguity behavior, and verified the expanded runtime suite in GitHub Actions. Opened live canonical-registry adapter integration as the next bounded unit."}
+    {"type": "continuation_advanced", "date": "2026-09-11", "summary": "Defined one logical Forest address/resolution contract in the canonical structural repository, compressed seven cross-layer interfaces into shared mutation/observation envelopes, implemented a replaceable runtime address parser/resolver with explicit provisional and ambiguity behavior, and verified the expanded runtime suite in GitHub Actions. Opened live canonical-registry adapter integration as the next bounded unit."},
+    {"type": "verification_boundary_discovered", "date": "2026-09-12", "summary": "Implemented a read-only canonical-registry adapter and live-integration test surface, then attempted two direct cross-repository CI transports. Both attempts failed before runtime tests because the workflow environment lacked a usable route/authority to the separate structural repository. The failure was isolated to transport rather than hidden by copying the registry."},
+    {"type": "continuation_advanced", "date": "2026-09-12", "summary": "Made live registry availability an explicit capability boundary, restored credential-independent CI, and verified the expanded runtime suite successfully in GitHub Actions job 103562050852. The live-registry criterion remains in progress until an authorized transport/mount executes the cross-repository resolution test."}
   ]
 }
