@@ -21,11 +21,12 @@ jobs:
       - name: Checkout implementation repository
         uses: actions/checkout@v4
 
-      - name: Checkout structural authority repository
-        uses: actions/checkout@v4
-        with:
-          repository: gulfshobot-source/the-forest
-          path: .canonical/the-forest
+      - name: Fetch structural authority registry
+        run: |
+          mkdir -p .canonical/the-forest/data
+          curl --fail --silent --show-error --location \
+            https://raw.githubusercontent.com/gulfshobot-source/the-forest/main/data/forest.json \
+            --output .canonical/the-forest/data/forest.json
 
       - name: Set up Python
         uses: actions/setup-python@v5
