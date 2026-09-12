@@ -21,13 +21,6 @@ jobs:
       - name: Checkout implementation repository
         uses: actions/checkout@v4
 
-      - name: Fetch structural authority registry
-        run: |
-          mkdir -p .canonical/the-forest/data
-          curl --fail --silent --show-error --location \
-            https://raw.githubusercontent.com/gulfshobot-source/the-forest/main/data/forest.json \
-            --output .canonical/the-forest/data/forest.json
-
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
@@ -36,7 +29,5 @@ jobs:
       - name: Install runtime test environment
         run: python -m pip install -e "runtime[test]"
 
-      - name: Run runtime tests against live canonical registry
-        env:
-          FOREST_CANONICAL_REGISTRY_PATH: ${{ github.workspace }}/.canonical/the-forest/data/forest.json
+      - name: Run runtime tests
         run: python -m pytest runtime/tests -q
