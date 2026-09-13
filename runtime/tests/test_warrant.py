@@ -14,6 +14,7 @@ def state():
                 "status": "pending",
                 "dependencies": [],
                 "leverage": 9,
+                "subject": "forest://architecture/world-engine",
                 "recovery": {"retry_allowed": True, "max_retries": 2},
             },
         ],
@@ -25,6 +26,7 @@ def test_regenerate_warrant_selects_highest_leverage_task():
     warrant = regenerate_warrant(state())
     assert warrant is not None
     assert warrant["task"] == "high"
+    assert warrant["subject"] == "forest://architecture/world-engine"
     assert warrant["state_version"] == "forest-state-v1"
     assert warrant["recovery"]["retry_allowed"] is True
     assert warrant["recovery"]["rollback_required_on_failure"] is False
@@ -34,6 +36,7 @@ def test_apply_regenerated_warrant_updates_state():
     s = state()
     apply_regenerated_warrant(s)
     assert s["warrant"]["id"] == "warrant-high"
+    assert s["warrant"]["subject"] == "forest://architecture/world-engine"
 
 
 def test_regenerate_warrant_returns_none_when_no_unblocked_task():
