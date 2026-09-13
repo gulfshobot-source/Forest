@@ -9,6 +9,7 @@ from pathlib import Path
 from typing import Any, Mapping, Protocol
 
 from .addressing import resolve_address
+from .bindings import derive_bindings
 
 
 class RegistryUnavailable(RuntimeError):
@@ -32,6 +33,7 @@ class LoadedRegistry:
 
     def resolve(self, forest_address: str) -> dict[str, Any]:
         result = dict(resolve_address(forest_address, self.registry))
+        result["bindings"] = derive_bindings(result["record"])
         result["registry_source"] = self.source
         result["registry_authority"] = self.authority
         result["registry_loaded_at"] = self.loaded_at
