@@ -10,6 +10,7 @@
     "objective": {"type": "string"},
     "position": {"type": "string"},
     "task": {"type": "string"},
+    "subject": {"type": "string", "pattern": "^forest://[^/]+/[^/]+$"},
     "selection_reason": {"type": "string"},
     "dependencies": {"type": "array", "items": {"type": "string"}},
     "inputs": {"type": "array", "items": {"type": "string"}},
