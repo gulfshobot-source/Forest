@@ -5,6 +5,7 @@ from __future__ import annotations
 from copy import deepcopy
 from typing import Any
 
+from .addressing import normalize_address
 from .core import select_next_task
 
 
@@ -35,7 +36,7 @@ def regenerate_warrant(state: dict[str, Any]) -> dict[str, Any] | None:
     project_objective = state.get("project", {}).get("objective") or "Advance Forest canonical state."
     position = state.get("position", {}).get("current_node") or "unknown"
 
-    return {
+    warrant = {
         "id": f"warrant-{task_id}",
         "state_version": _state_version(state),
         "objective": task.get("objective", project_objective),
@@ -56,6 +57,9 @@ def regenerate_warrant(state: dict[str, Any]) -> dict[str, Any] | None:
             if candidate.get("id") != task_id and candidate.get("status", "pending") == "pending"
         ],
     }
+    if task.get("subject") is not None:
+        warrant["subject"] = normalize_address(str(task["subject"]))
+    return warrant
 
 
 def apply_regenerated_warrant(state: dict[str, Any]) -> dict[str, Any]:
