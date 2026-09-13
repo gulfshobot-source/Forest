@@ -12,6 +12,8 @@ from dataclasses import dataclass
 from datetime import datetime, timezone
 from typing import Any, Callable, Iterable
 
+from .addressing import AddressError, normalize_address
+
 
 @dataclass(frozen=True)
 class Selection:
@@ -79,6 +81,20 @@ def _now() -> str:
     return datetime.now(timezone.utc).isoformat()
 
 
+def _prepare_task(task: dict[str, Any]) -> dict[str, Any]:
+    """Prepare an execution copy while preserving the canonical task record.
+
+    Forest subjects are logical identities, not storage locators. When a task names a
+    subject, normalize it before crossing the executor boundary so adapters can remain
+    independent of repository paths or UI routes.
+    """
+    prepared = deepcopy(task)
+    subject = prepared.get("subject")
+    if subject is not None:
+        prepared["subject"] = normalize_address(str(subject))
+    return prepared
+
+
 def transition(state: dict[str, Any], task: dict[str, Any], result: dict[str, Any]) -> dict[str, Any]:
     next_state = deepcopy(state)
     pos = next_state.setdefault("position", {})
@@ -112,6 +128,7 @@ def transition(state: dict[str, Any], task: dict[str, Any], result: dict[str, An
         "timestamp": _now(),
         "type": "task_result",
         "task_id": task_id,
+        "subject": task.get("subject"),
         "attempt": updated_task["attempts"],
         "status": updated_task["status"],
         "passed": passed,
@@ -145,7 +162,19 @@ def _execute_safely(
     task: dict[str, Any],
 ) -> dict[str, Any]:
     try:
-        result = executor(state, task)
+        prepared_task = _prepare_task(task)
+    except AddressError as exc:
+        return {
+            "passed": False,
+            "evidence": [],
+            "failure": {
+                "classification": "invalid_task_subject",
+                "type": type(exc).__name__,
+                "message": str(exc),
+            },
+        }
+    try:
+        result = executor(state, prepared_task)
     except Exception as exc:  # executor is an isolation boundary by design
         return {
             "passed": False,
@@ -194,6 +223,7 @@ def continue_once(
     report = {
         "status": status,
         "task_id": task["id"],
+        "subject": task.get("subject"),
         "selection_reason": selection.reason,
         "result": result,
         "attempt": updated.get("attempts", 0),
