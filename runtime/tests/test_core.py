@@ -82,3 +82,36 @@ def test_executor_exception_is_captured_as_failure_evidence():
     assert report["result"]["failure"]["classification"] == "executor_exception"
     assert report["result"]["failure"]["type"] == "RuntimeError"
     assert new["history"][-1]["failure"]["message"] == "boom"
+
+
+def test_task_subject_is_normalized_before_executor_and_preserved_in_history():
+    s = state()
+    foundation = next(t for t in s["tasks"] if t["id"] == "foundation")
+    foundation["subject"] = "forest://tree/irrigation"
+    seen = {}
+
+    def executor(_state, task):
+        seen.update(task)
+        return {"passed": True, "evidence": [task["subject"]]}
+
+    new, report = continue_once(s, executor)
+    assert seen["subject"] == "forest://tree/irrigation"
+    assert report["subject"] == "forest://tree/irrigation"
+    assert new["history"][-1]["subject"] == "forest://tree/irrigation"
+
+
+def test_invalid_task_subject_never_crosses_executor_boundary():
+    s = state()
+    foundation = next(t for t in s["tasks"] if t["id"] == "foundation")
+    foundation["subject"] = "github://repo/path"
+    called = False
+
+    def executor(*_):
+        nonlocal called
+        called = True
+        return {"passed": True}
+
+    _new, report = continue_once(s, executor)
+    assert called is False
+    assert report["status"] == "BLOCKED"
+    assert report["result"]["failure"]["classification"] == "invalid_task_subject"
