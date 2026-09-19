@@ -5,7 +5,7 @@ from dataclasses import dataclass
 import hashlib
 import json
 from pathlib import Path
-from typing import Any, Mapping
+from typing import Any, Mapping, Protocol
 
 from .mutation import CanonicalMutationPlan, MutationExecutionError, apply_plan_to_snapshot
 from .registry import LoadedRegistry
@@ -59,6 +59,24 @@ class MutationReceipt:
         }
 
 
+class CanonicalStore(Protocol):
+    """Minimal store contract: fresh read plus revision-pinned compare-and-swap.
+
+    Authentication and provider-specific mutation logic remain outside the kernel.
+    Implementations MUST reject compare_and_swap when the supplied revision or digest
+    no longer names the current canonical snapshot.
+    """
+
+    def load(self) -> LoadedRegistry: ...
+
+    def compare_and_swap(
+        self,
+        plan: CanonicalMutationPlan,
+        expected_revision: str | None,
+        expected_digest: str | None,
+    ) -> None: ...
+
+
 def _receipt_id(plan: CanonicalMutationPlan, after: LoadedRegistry) -> str:
     payload = {
         "plan_id": plan.plan_id, "subject": plan.subject,
@@ -73,12 +91,7 @@ def _receipt_id(plan: CanonicalMutationPlan, after: LoadedRegistry) -> str:
 def verify_persisted_mutation(
     plan: CanonicalMutationPlan, before: LoadedRegistry, after: LoadedRegistry,
 ) -> MutationReceipt:
-    """Verify an external compare-and-swap canonical write from a fresh reread.
-
-    This performs no write. Store-specific credentials/mutation logic stay outside the
-    kernel: an adapter must compare-and-swap using the plan revision/digest and then
-    supply the reread. The kernel owns the universal proof contract.
-    """
+    """Verify an external compare-and-swap canonical write from a fresh reread."""
     if not plan.executable:
         raise MutationExecutionError(f"mutation plan is not executable: {plan.state}")
     apply_plan_to_snapshot(plan, before)
@@ -100,3 +113,22 @@ def verify_persisted_mutation(
         after_digest=after.content_digest, verified_fields=tuple(sorted(plan.changes)),
         receipt_id=_receipt_id(plan, after),
     )
+
+
+def execute_verified_mutation(plan: CanonicalMutationPlan, store: CanonicalStore) -> MutationReceipt:
+    """Execute the universal safe-write sequence against a provider adapter.
+
+    The kernel owns ordering and proof: fresh read -> plan validation -> CAS -> fresh
+    reread -> receipt. The store owns only transport/authentication and the atomic CAS.
+    This keeps every future connector on one mutation law instead of bespoke workflows.
+    """
+    if not plan.executable:
+        raise MutationExecutionError(f"mutation plan is not executable: {plan.state}")
+
+    before = store.load()
+    # Revalidate subject, source, revision, digest, and planned mutation immediately
+    # before crossing the provider write boundary.
+    apply_plan_to_snapshot(plan, before)
+    store.compare_and_swap(plan, plan.source_revision, plan.source_digest)
+    after = store.load()
+    return verify_persisted_mutation(plan, before, after)
