@@ -1,0 +1,25 @@
+{
+  "evidence_version": "1.0",
+  "observed_at": "2026-09-21T13:26:46Z",
+  "canonical_repository": "gulfshobot-source/the-forest",
+  "canonical_path": "data/forest.json",
+  "canonical_head_revision": "c3026a4016f61f83c07d1a75c071131f54693cb7",
+  "canonical_blob_sha": "cffc6f038dc0eb283e52bbf9842bd9a82f67b6b1",
+  "subject": "forest://architecture/downstairs-connector-fabric",
+  "observed_record": {
+    "id": "downstairs-connector-fabric",
+    "state": "authoritative-living",
+    "canonical_path": "architecture/DOWNSTAIRS_CONNECTOR_FABRIC.md"
+  },
+  "transport": "authorized GitHub connector",
+  "provider_adapter_commit": "7f1b9bd2aec949a27d33a06c1ae156c9597d6d51",
+  "provider_test_commit": "42c1f24f2fb836acf01dd937534931fc8e734c45",
+  "claims": {
+    "live_authoritative_read": "verified",
+    "subject_shape_conforms_to_adapter": "verified",
+    "provider_unit_contract": "implemented",
+    "live_compare_and_swap_write": "not_yet_executed",
+    "live_reread_receipt": "not_yet_produced"
+  },
+  "safety_note": "No canonical mutation was manufactured solely to create a success claim. The remaining write proof must use an intentional canonical change and the revision/blob preconditions already required by the adapter."
+}
