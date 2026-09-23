@@ -3,10 +3,24 @@
   "purpose": "Non-canonical live transport probe for Forest GitHub compare-and-swap semantics",
   "canonical": false,
   "target": "gulfshobot-source/Forest",
-  "phase": "cas-updated",
-  "sequence": 2,
+  "phase": "verified",
+  "sequence": 3,
   "date": "2026-09-23",
-  "precondition_blob_sha": "410c14893e43bee0ad213684f83c983019c36174",
   "create_commit": "497180ae5595ff825b557a4dfb28bb4d573e2cfc",
-  "note": "Updated only with the blob SHA returned by the authoritative reread; disposable experimental evidence, not canonical Forest structure."
+  "first_precondition_blob_sha": "410c14893e43bee0ad213684f83c983019c36174",
+  "successful_cas_commit": "a002cf1f2362ab9fc075eb3d273ba6c7a7215652",
+  "successful_cas_blob_sha": "f4dc9496f3b56259d7d654c16760df44612cb258",
+  "stale_precondition_test": {
+    "attempted_blob_sha": "410c14893e43bee0ad213684f83c983019c36174",
+    "expected_current_blob_sha": "f4dc9496f3b56259d7d654c16760df44612cb258",
+    "result": "rejected",
+    "status": 409
+  },
+  "verified_properties": [
+    "live connector write succeeds with current blob precondition",
+    "post-write commit and blob identities are returned",
+    "authoritative reread observes written content",
+    "stale blob precondition is rejected without overwrite"
+  ],
+  "unproven_boundary": "This proves the host GitHub connector CAS mechanics on the non-canonical sketchpad repository. It does not prove execution through the in-process Forest GitHubCanonicalStore or authorize a synthetic mutation of canonical data/forest.json."
 }
