@@ -3,8 +3,10 @@
   "purpose": "Non-canonical live transport probe for Forest GitHub compare-and-swap semantics",
   "canonical": false,
   "target": "gulfshobot-source/Forest",
-  "phase": "created",
-  "sequence": 1,
+  "phase": "cas-updated",
+  "sequence": 2,
   "date": "2026-09-23",
-  "note": "Disposable experimental evidence only; this file does not mutate canonical Forest structure."
+  "precondition_blob_sha": "410c14893e43bee0ad213684f83c983019c36174",
+  "create_commit": "497180ae5595ff825b557a4dfb28bb4d573e2cfc",
+  "note": "Updated only with the blob SHA returned by the authoritative reread; disposable experimental evidence, not canonical Forest structure."
 }
