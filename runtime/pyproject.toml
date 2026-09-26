@@ -15,6 +15,11 @@ test = ["pytest>=8,<9"]
 [project.scripts]
 forest = "forest_runtime.cli:main"
 
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["forest_runtime*"]
+exclude = ["evidence*", "tests*"]
+
 [tool.pytest.ini_options]
 pythonpath = ["."]
 testpaths = ["tests"]
